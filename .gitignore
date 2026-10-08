@@ -4,6 +4,7 @@ data/
 .env
 .env.*
 !.env.example
+!.env.test
 
 
 # Byte-compiled / optimized / DLL files
