@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<article class="surface-card">
+    <span class="eyebrow">Vielen Dank</span>
+    <h1>Bestellung erfolgreich versendet</h1>
+    <p class="muted">Deine Anfrage ist bei den Erlangen Rebels eingegangen. Wir melden uns per E-Mail bei dir.</p>
+    <a href="{% url 'merchandiseshop:product_list' %}" role="button">Zurück zum Shop</a>
+</article>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="page-intro">
+    <span class="eyebrow">Fast geschafft</span>
+    <h1>Bestellung abschließen</h1>
+</header>
+
+<form method="post">
+    {% csrf_token %}
+    <div class="grid checkout-grid">
+        <article class="surface-card">
+            <h3>Kontaktdaten</h3>
+            <label for="full_name">
+                Vor- & Nachname *
+                <input type="text" id="full_name" name="full_name" maxlength="200" required
+                    value="{{ form_data.full_name|default:'' }}">
+            </label>
+
+            <label for="email">
+                E-Mail-Adresse *
+                <input type="email" id="email" name="email" maxlength="200" required
+                    value="{{ form_data.email|default:'' }}">
+            </label>
+
+            <label for="notes">
+                Anmerkungen (Optional)
+                <textarea id="notes" name="notes" rows="3" maxlength="1000">{{ form_data.notes|default:'' }}</textarea>
+            </label>
+        </article>
+
+
+        <article class="surface-card checkout-summary">
+            <h3>Bestellübersicht</h3>
+
+            <ul style="list-style: none; padding: 0; margin-bottom: 40px; border-bottom: 0px">
+                {% for item in cart %}
+                <li class="summary-item"
+                    style="padding: 12px 0; border-bottom: 1px solid #e0e0e0; margin-bottom: 10px; ">
+
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <span>
+                            <strong>{{ item.quantity }}x {{ item.product_name }}</strong> ({{ item.variant.size }})
+                        </span>
+                        <strong style="font-variant-numeric: tabular-nums; white-space: nowrap; margin-left: 10px;">
+                            {{ item.total_price|floatformat:2 }} €
+                        </strong>
+                    </div>
+
+                    <!-- Zeile 2: Customizations (falls vorhanden) -->
+                    {% if item.customizations %}
+                    <span style="display: block; margin-top: 6px; ">
+                        {% for key, val in item.customizations.items %}
+                        <div><strong>{{ key }}:</strong> {{ val }}</div>
+                        {% endfor %}
+                    </span>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+
+            <table style="border: none; margin-bottom: 10px; padding: 0; width: 100%; background: transparent;">
+                <tbody>
+                    <tr style="background: transparent;">
+                        <td style="border: none; padding: 2px 0; font-weight: bold; background: transparent;">
+                            Gesamtsumme netto:
+                        </td>
+                        <td
+                            style="border: none; padding: 2px 0; text-align: right; font-weight: bold; font-variant-numeric: tabular-nums; background: transparent;">
+                            {{ cart.get_total_price|floatformat:2 }} €
+                        </td>
+                    </tr>
+                    <tr style="background: transparent;">
+                        <td style="border: none; padding: 2px 0; font-weight: bold; background: transparent;">
+                            MwSt. (19%):
+                        </td>
+                        <td
+                            style="border: none; padding: 2px 0; text-align: right; font-weight: bold; font-variant-numeric: tabular-nums; background: transparent;">
+                            {{ cart.get_tax_price|floatformat:2 }} €
+                        </td>
+                    </tr>
+                    <tr style="background: transparent;">
+                        <td style="border: none; padding: 2px 0; font-weight: bold; background: transparent;">
+                            Gesamtsumme brutto:
+                        </td>
+                        <td
+                            style="border: none; padding: 2px 0; text-align: right; font-weight: bold; font-variant-numeric: tabular-nums; background: transparent;">
+                            {{ cart.get_total_price_including_tax|floatformat:2 }} €
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- Datenschutzhinweis-->
+            <!-- Datenschutzhinweis mit Checkbox -->
+            <label style="display: block; margin-top: 20px; cursor: pointer;">
+                <input type="checkbox" id="privacy-check" name="privacy_accepted" required
+                    {% if form_data.privacy_accepted %}checked{% endif %} />
+                Hier folgt ein Datenschutzhinweis mit Link *
+            </label>
+
+            {% if error %}
+            <div
+                style="background: #fff0e8; border: 1px solid #e26a2c; color: #b94a1f; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong>Fehler:</strong> {{ error }}
+            </div>
+            {% endif %}
+            <!-- CAPTCHA-BLOCK (Startet unsichtbar) -->
+            <div id="captcha-wrapper"
+                style="display: none; margin-top: 15px; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                <label style="font-weight: bold; display: block; margin-bottom: 8px;">Bitte Sicherheitsabfrage
+                    bestätigen *</label>
+
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <!-- Captcha Bild -->
+                    <img src="{{ captcha_image_url }}" alt="Captcha"
+                        style="border: 1px solid #ccc; border-radius: 4px; vertical-align: middle;">
+
+                    <!-- Versteckter Hash für die Session/DB -->
+                    <input type="hidden" name="captcha_hashkey" value="{{ captcha_hashkey }}">
+
+                    <!-- Eingabefeld (Anforderung wird dynamisch per JS gesteuert) -->
+                    <input type="text" id="captcha-input" name="captcha_response" placeholder="Code eingeben"
+                        autocomplete="off" style="width: 300px;">
+                </div>
+            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const privacyCheck = document.getElementById('privacy-check');
+                    const captchaWrapper = document.getElementById('captcha-wrapper');
+                    const captchaInput = document.getElementById('captcha-input');
+
+                    function toggleCaptcha() {
+                        if (privacyCheck.checked) {
+                            captchaWrapper.style.display = 'block';
+                            captchaInput.required = true; // Pflichtfeld, wenn sichtbar
+                        } else {
+                            captchaWrapper.style.display = 'none';
+                            captchaInput.required = false;
+                            captchaInput.value = ''; // Eingabe zurücksetzen, falls wieder abgewählt
+                        }
+                    }
+
+                    // Beim ersten Laden prüfen (falls die Seite neu geladen wird und die Checkbox noch aktiv ist)
+                    toggleCaptcha();
+
+                    // Event-Listener für Klick/Änderung
+                    privacyCheck.addEventListener('change', toggleCaptcha);
+                });
+            </script>
+            <!-- Checkout box-->
+            <center>
+                <u>
+                    <p style="font-weight: bold; margin-top: 40px;">Dies ist nur ein Test -> Es wird keine verbindliche
+                        Bestellung ausgelöst. Bestellbestätigung per Mail bitte ignorieren!</p>
+                </u>
+            </center>
+            <button type="submit">Bestellung absenden</button>
+        </article>
+    </div>
+</form>
+{% endblock %}

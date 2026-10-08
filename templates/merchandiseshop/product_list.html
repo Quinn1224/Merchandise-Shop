@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="page-intro">
+    <span class="eyebrow">Erlangen Rebels / Teamwear</span>
+    <h1>Unser Team Merch</h1>
+    <p class="muted">Dein Look für Spieltag, Training und jeden Tag.</p>
+</header>
+
+<div class="grid product-grid">
+    {% for product in products %}
+    <article class="product-card">
+        <header>
+              <a href="{% url 'merchandiseshop:product_detail' product.slug %}">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="image-placeholder">Kein Bild</div>
+            {% endif %}
+            </a>
+        </header>
+        
+        <h3>{{ product.name }}</h3>
+        
+        <footer>
+            <strong class="price">{{ product.price |floatformat:2}} €</strong>
+            <a href="{% url 'merchandiseshop:product_detail' product.slug %}" role="button">Details & Anpassen</a>
+        </footer>
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}

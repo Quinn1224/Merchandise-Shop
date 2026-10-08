@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<header class="page-intro">
+    <span class="eyebrow">Deine Auswahl</span>
+    <h1>Dein Warenkorb</h1>
+</header>
+
+{% if cart %}
+<article class="surface-card">
+    <div class="cart-table">
+    <table class="striped">
+        <thead>
+            <tr>
+                <th scope="col">Artikel</th>
+                <th scope="col">Größe</th>
+                <th scope="col">Personalisierung</th>
+                <th scope="col">Menge</th>
+                <th scope="col">Preis (netto)</th>
+                <th scope="col">Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart %}
+            <tr>
+                <td><strong>{{ item.product_name }}</strong></td>
+                <td>{{ item.variant.size }}</td>
+                <td>
+                    {% if item.customizations %}
+                    <small>
+                        {% for key, val in item.customizations.items %}
+                        <div><strong>{{ key }}:</strong> {{ val }}</div>
+                        {% endfor %}
+                    </small>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.total_price |floatformat:2}} €</td>
+                <td class="cart-remove-cell">
+                    <form class="cart-remove-form" action="{% url 'merchandiseshop:cart_remove' item.item_id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="outline">
+                            Entfernen
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+
+    <footer class="cart-actions">
+        <h3>Gesamtsumme: {{ cart.get_total_price |floatformat:2}} €</h3>
+        <div class="cart-action-buttons">
+            <a href="{% url 'merchandiseshop:product_list' %}" class="secondary" role="button">Weiter einkaufen</a>
+            <a href="{% url 'merchandiseshop:checkout' %}" role="button">Zum Checkout</a>
+        </div>
+    </footer>
+</article>
+
+{% else %}
+<p>Dein Warenkorb ist derzeit leer.</p>
+<a href="{% url 'merchandiseshop:product_list' %}" role="button">Zurück zum Shop</a>
+{% endif %}
+{% endblock %}

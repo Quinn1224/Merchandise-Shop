@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<article class="product-detail surface-card">
+    <div class="grid">
+        <div>
+            {% if product.image %}
+            <img class="product-image" src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% endif %}
+        </div>
+
+        <div>
+            <div class="product-info">
+                <span class="eyebrow">Teamwear</span>
+                <h1>{{ product.name }}</h1>
+                <p class="price">{{ product.price }} € (netto)</p>
+                <p class="muted">{{ product.description }}</p>
+
+                {% if error %}
+                <div
+                    style="background: #fff0e8; border: 1px solid #e26a2c; color: #b94a1f; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <strong>Fehler:</strong> {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <fieldset>
+                        <legend><strong>Variante</strong></legend>
+                        <label for="size">
+                            Größe *
+                            <select id="size" name="size" required>
+                                <option value="">-- Größe wählen --</option>
+                                {% for size in sizes %}
+                                <option value="{{ size.id }}">{{ size.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label for="color">
+                            Farbe *
+                            <select id="color" name="color" required disabled>
+                                <option value="">-- Zuerst Größe wählen --</option>
+                            </select>
+                        </label>
+                        <input type="hidden" id="variant_id" name="variant_id">
+                    </fieldset>
+
+                    {% if options %}
+                    <fieldset class="personalization-options">
+                        <legend><strong>Personalisierung</strong></legend>
+                        {% for opt in options %}
+                        <label
+                            class="option-row {% if opt.option_type == 'checkbox' %}checkbox-option{% else %}input-option{% endif %}"
+                            for="option_{{ opt.id }}">
+                            <span class="option-label">
+                                {{ opt.name }} ({{ opt.price|floatformat:2 }}€){% if opt.required %} *{% endif %}
+                            </span>
+
+                            {% if opt.option_type == 'text' %}
+                            <input type="text" id="option_{{ opt.id }}" name="option_{{ opt.id }}" maxlength="50"{% if opt.required %} required minlength="1"{% endif %}>
+                            {% elif opt.option_type == 'number' %}
+                            <input type="number" id="option_{{ opt.id }}" name="option_{{ opt.id }}" max="1000"{% if opt.required %} required min="1"{% endif %}>
+                            {% elif opt.option_type == 'checkbox' %}
+                            <input type="checkbox" id="option_{{ opt.id }}" name="option_{{ opt.id }}" value="Ja"{% if opt.required %} required{% endif %}>
+                            {% endif %}
+                        </label>
+                        {% endfor %}
+                    </fieldset>
+                    {% endif %}
+
+
+                    <label for="quantity">
+                        Anzahl:
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" max="1000">
+                    </label>
+
+                    <button type="submit" id="add-to-cart-btn" disabled>In den Warenkorb</button>
+                </form>
+                <a class="secondary outline back-to-shop" href="{% url 'merchandiseshop:product_list' %}" role="button">&larr; Zurück
+                    zur Übersicht</a>
+            </div>
+        </div>
+    </div>
+    {{ variants_by_size|json_script:"variants-data" }}
+</article>
+<script>
+    // Varianten-Daten sicher über das json_script einlesen
+    const variantsBySize = JSON.parse(document.getElementById('variants-data').textContent);
+
+    const colorSelect = document.getElementById('color');
+    const sizeSelect = document.getElementById('size');
+    const variantInput = document.getElementById('variant_id');
+    const addButton = document.getElementById('add-to-cart-btn');
+
+    // Wenn Größe geändert wird, Farben aktualisieren
+    sizeSelect.addEventListener('change', function () {
+        const selectedSizeId = this.value;
+        //Farboptionen abloeschen
+        colorSelect.innerHTML = '';
+        variantInput.value = '';
+        addButton.disabled = true;
+
+        if (!selectedSizeId) {
+            colorSelect.disabled = true
+            colorSelect.innerHTML = ' <option value="">-- Zuerst Größe wählen --</option>';
+            return;
+        }
+        //Verfügbare Farben für die ausgewählte Größe ermitteln
+        const variants = variantsBySize[selectedSizeId];
+        if (variants && variants.length > 0) {
+            colorSelect.disabled = false;
+            colorSelect.innerHTML = ' <option value="">-- Farbe wählen --</option>';
+
+            variants.forEach(variant => {
+                const option = document.createElement('option');
+                option.value = variant.id;
+                option.textContent = variant.color;
+                option.dataset.variantId = variant.id;
+                colorSelect.appendChild(option);
+            });
+        }
+
+    })
+    // Wenn Farbe geändert wird, Variant-ID setzen und Button aktivieren
+    colorSelect.addEventListener('change', function () {
+        if (this.value) {
+            variantInput.value = this.value;
+            addButton.disabled = false;
+        } else {
+            variantInput.value = '';
+            addButton.disabled = true;
+        }
+
+    }) 
+</script>
+{% endblock %}
