@@ -5,6 +5,7 @@ Es soll ein kleiner Webshop entstehen, in dem Merchandise von den Erlangen Rebel
 Eine Bezahlfunktion wird es vorerst nicht geben, die Zahlung muss auf separatem Weg erfolgen.<br>
 
 Artikel sind über eine Adminstrationsoberfläche zur Laufzeit konfigurierbar.<br>
-Dort können Produkte, verfügbare Farben & Größen sowie Personalisierungsdetails eingestellt werden. Weitere Details folgen!
+Dort können Produkte, verfügbare Farben & Größen sowie Personalisierungsdetails eingestellt werden. <br>
+Weitere Detais folgen! :)
 
-Ein aktueller Stand läuft
+Ein aktueller Stand läuft unter https://shop.erlangenrebels.duckdns.org/, bislang jedoch nur zu Testzwecken!
