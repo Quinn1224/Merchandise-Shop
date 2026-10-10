@@ -1,5 +1,5 @@
 services:
-  quiz:     
+  shop:
     image: ghcr.io/quinn1224/merchandise-shop:latest
     container_name: merchandise-shop
     restart: always

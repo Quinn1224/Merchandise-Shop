@@ -6,7 +6,7 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True, verbose_name='Beschreibung')
     price = models.DecimalField(max_digits=6, decimal_places=2, verbose_name='Preis')
-    image = models.ImageField(upload_to='shop/products', verbose_name='Bild')
+    image = models.ImageField(upload_to='products', verbose_name='Bild')
     last_modified = models.DateTimeField(auto_now=True, verbose_name='Zuletzt editiert')
     created = models.DateTimeField(auto_now_add=True, verbose_name='Erstellungszeitpunkt')
     class Meta:
