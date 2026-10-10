@@ -7,10 +7,10 @@ from django.views.generic import RedirectView, TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('admin', RedirectView.as_view(url='admin/')),
-    path('', include('merchandiseshop.urls', namespace='merchandiseshop')),
-    path('captcha/', include('captcha.urls')),
     path('impressum/', TemplateView.as_view(template_name='impressum.html'), name='impressum'),
     path('datenschutz/', TemplateView.as_view(template_name='datenschutz.html'), name='datenschutz'),
+    path('captcha/', include('captcha.urls')),
+    path('', include('merchandiseshop.urls', namespace='merchandiseshop')),
 ]
 
 if settings.DEBUG:

@@ -19,6 +19,18 @@ from .models import (
 )
 
 
+class LegalPageTests(TestCase):
+    def test_legal_pages_are_not_captured_by_product_slug_route(self):
+        for path, heading in (
+            ('/impressum/', 'Impressum'),
+            ('/datenschutz/', 'Datenschutzerklärung'),
+        ):
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, heading)
+
+
 class OrderWorkflowTests(TestCase):
     @classmethod
     def setUpClass(cls):
