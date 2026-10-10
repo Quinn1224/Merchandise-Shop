@@ -22,7 +22,7 @@ class ProductVariantInline(admin.TabularInline):
 class CustomizationOptionInLine(admin.TabularInline):
     model = CustomizationOption
     extra = 1
-    fields = ('label', 'option_type', 'required', 'extra_price')
+    fields = ('name', 'option_type', 'required', 'price')
 
 # Propdukte
 @admin.register(Product)
