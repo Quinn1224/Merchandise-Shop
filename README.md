@@ -9,3 +9,4 @@ Dort können Produkte, verfügbare Farben & Größen sowie Personalisierungsdeta
 Weitere Detais folgen! :)
 
 Ein aktueller Stand läuft unter https://shop.erlangenrebels.duckdns.org/, bislang jedoch nur zu Testzwecken!
+Aktuell erzeugte Bestellungen werden nicht bearbeitet!
